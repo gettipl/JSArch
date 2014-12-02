@@ -1,3 +1,5 @@
+Injector.configuration('main',{version : '0.1'});
+
 Injector.factory('Foo', [],function(){
     return {
         log : function(){
@@ -10,6 +12,7 @@ Injector.factory('FooWithDependencies',['Foo'],function(foo){
     return {
         log : function(){
             console.log('FooWithDependencies');
+            foo.log();
         }
     }
 });
@@ -23,6 +26,18 @@ Injector.controller('ExampleController',['Foo','FooWithDependencies'],function(f
     }
 });
 
-Injector.resolve(['ExampleController'],function(controller){
+Injector.instance("instance",[],function(){
+    console.log('instance created');
+    return {
+
+    }
+});
+
+Injector.resolve(['ExampleController', 'instance', 'main'],function(controller,instance,main){
     controller.action();
+    console.log(main.version);
+});
+
+Injector.resolve(['instance'],function(instance){
+
 });
