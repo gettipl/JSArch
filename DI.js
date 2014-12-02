@@ -5,24 +5,25 @@ var Injector = function () {
     var container = {};
     var cache = {};
 
-    var getDependence = function (func,deps,args,that,scope) {
+    var getDependence = function (func, deps, args, that, scope) {
         for (var i = 0; i < deps.length; i++) {
             var d = deps[i];
             if (!container[d] && d != '')
                 throw new Error('Not registered dependency :' + d);
 
-            if(cache[d])
-                return cache[d];
-
             var object;
-            if (container[d].dependencies.length == 0){
+
+            if (cache[d]) {
+                object = cache[d];
+            }
+            else if (container[d].dependencies.length == 0) {
                 object = container[d].func();
-                if(container[d].type === 'instance')
+                if (container[d].type === 'instance')
                     cache[d] = object;
             }
-            else{
+            else {
                 object = that.resolve(container[d].dependencies, container[d].func);
-                if(container[d].type === 'instance')
+                if (container[d].type === 'instance')
                     cache[d] = object;
             }
             args.push(object)
@@ -53,8 +54,10 @@ var Injector = function () {
             register(name, dependencies, fun, 'instance');
         },
 
-        configuration: function (name,object){
-            register(name,[],function(){return object;},'configuration');
+        configuration: function (name, object) {
+            register(name, [], function () {
+                return object;
+            }, 'configuration');
         },
 
         controller: function (name, dependencies, fun) {
@@ -62,7 +65,7 @@ var Injector = function () {
         },
 
         resolve: function () {
-            var  args = [], that = this;
+            var args = [], that = this;
             var func = arguments[1];
             var deps = arguments[0];
             var scope = arguments[2] || {};
@@ -73,7 +76,7 @@ var Injector = function () {
                 throw new Error('You must pass valid service creation function');
 
 
-            return getDependence(func,deps,args,that,scope);
+            return getDependence(func, deps, args, that, scope);
         }
     }
 }();
